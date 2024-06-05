@@ -8,9 +8,28 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.distinct.pluck(:rating) #returns an array of all unique ratings present in the "movies" table.
-    @ratings_to_show_hash = params[:ratings] || {} ##incoming ratings from form in hash 
-    #params[:ratings] = { "G" => "1", "PG" => "1", "R" => "1" }
-    @sort_column = params[:sort] ##if sort parameter is requested in the URL it keeps which column in the variable
+    # @ratings_to_show_hash = params[:ratings] || {} ##incoming ratings from form in hash 
+    # #params[:ratings] = { "G" => "1", "PG" => "1", "R" => "1" }
+    # @sort_column = params[:sort] ##if sort parameter is requested in the URL it keeps which column in the variable
+
+    # If params[:ratings] is present, use it, otherwise use session[:ratings] if it exists
+    if params[:ratings]
+      @ratings_to_show_hash = params[:ratings]
+      session[:ratings] = @ratings_to_show_hash ###save it in session
+    elsif session[:ratings]
+      @ratings_to_show_hash = session[:ratings]
+    else
+      @ratings_to_show_hash = {}
+    end
+
+    if params[:sort]
+      @sort_column = params[:sort]
+      session[:sort] = @sort_column
+    elsif session[:sort]
+      @sort_column = session[:sort]
+    else
+      @sort_column = 'title' # default sorting by title
+    end
 
     if @ratings_to_show_hash.any?
       selected_ratings = @ratings_to_show_hash.keys
