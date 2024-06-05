@@ -10,13 +10,19 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.distinct.pluck(:rating) #returns an array of all unique ratings present in the "movies" table.
     @ratings_to_show_hash = params[:ratings] || {} ##incoming ratings from form in hash 
     #params[:ratings] = { "G" => "1", "PG" => "1", "R" => "1" }
+    @sort_column = params[:sort] ##if sort parameter is requested in the URL it keeps which column in the variable
 
-    if params[:commit] == 'Refresh'
+    if @ratings_to_show_hash.any?
       selected_ratings = @ratings_to_show_hash.keys
-      @movies = Movie.with_ratings(selected_ratings)
+      @movies = Movie.with_ratings(selected_ratings) 
     else
       @movies = Movie.all
     end
+    if @sort_column ## will order it if @sort_column has a specified column
+      @movies = @movies.order(@sort_column)
+    end
+
+    @highlight_column = params[:sort] ## highlight it if incoming sort request
   end
 
   def new
