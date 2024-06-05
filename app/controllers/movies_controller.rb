@@ -7,7 +7,16 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = Movie.distinct.pluck(:rating) #returns an array of all unique ratings present in the "movies" table.
+    @ratings_to_show_hash = params[:ratings] || {} ##incoming ratings from form in hash 
+    #params[:ratings] = { "G" => "1", "PG" => "1", "R" => "1" }
+
+    if params[:commit] == 'Refresh'
+      selected_ratings = @ratings_to_show_hash.keys
+      @movies = Movie.with_ratings(selected_ratings)
+    else
+      @movies = Movie.all
+    end
   end
 
   def new
