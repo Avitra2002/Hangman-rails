@@ -13,9 +13,10 @@ class MoviesController < ApplicationController
     # @sort_column = params[:sort] ##if sort parameter is requested in the URL it keeps which column in the variable
 
     # If params[:ratings] is present, use it, otherwise use session[:ratings] if it exists
-    if params[:ratings]
-      @ratings_to_show_hash = params[:ratings]
-      session[:ratings] = @ratings_to_show_hash ###save it in session
+    # Check if the form was submitted as if nothing is chosen in the tick box it will not get a request hence no chnages
+    if params[:form_submitted]
+      @ratings_to_show_hash = params[:ratings] || {}
+      session[:ratings] = @ratings_to_show_hash
     elsif session[:ratings]
       @ratings_to_show_hash = session[:ratings]
     else
